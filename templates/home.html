@@ -1,85 +1,138 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>비공개공간</title>
+    <title>Home</title>
+
     <style>
-        body { background:#fff0f5; font-family:sans-serif; padding:20px; }
-        .section { background:white; padding:20px; margin-bottom:20px; border-radius:15px; }
-        .done { text-decoration: line-through; color:gray; }
+        body {
+            margin:0;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background:#f5f5f7;
+            padding:40px;
+        }
+
+        .container {
+            max-width:900px;
+            margin:auto;
+        }
+
+        h1 {
+            font-size:28px;
+            font-weight:600;
+        }
+
+        .card {
+            background:white;
+            padding:25px;
+            border-radius:18px;
+            margin-top:20px;
+        }
+
+        input, textarea {
+            width:100%;
+            padding:10px;
+            margin-top:10px;
+            border:1px solid #ddd;
+            border-radius:8px;
+        }
+
+        button {
+            margin-top:10px;
+            padding:8px 15px;
+            border:none;
+            border-radius:8px;
+            background:black;
+            color:white;
+        }
+
+        .todo-done {
+            text-decoration: line-through;
+            color:gray;
+        }
+
+        img {
+            border-radius:10px;
+        }
     </style>
 </head>
+
 <body>
 
-<h1>❤️{{ dday }}일</h1>
-<a href="/logout">로그아웃</a>
+<div class="container">
 
-<!-- 게시판 -->
-<div class="section">
-<h2>편지</h2>
+<h1>❤️ {{ dday }} days</h1>
+
+<a href="/logout">Logout</a>
+
+<!-- 💌 -->
+<div class="card">
+<h3>Letters</h3>
+
 <form method="POST" action="/post">
-<textarea name="content"></textarea>
-<button>작성</button>
+<textarea name="content" placeholder="Write something..."></textarea>
+<button>Add</button>
 </form>
 
-<ul>
 {% for p in posts %}
-<li>{{p[1]}} <a href="/delete_post/{{p[0]}}">삭제</a></li>
+<p>{{p[1]}} <a href="/delete_post/{{p[0]}}">x</a></p>
 {% endfor %}
-</ul>
 </div>
 
-<!--todo -->
-<div class="section">
-<h2>하고 싶은 것</h2>
+
+<!-- ✅ -->
+<div class="card">
+<h3>Bucket List</h3>
+
 <form method="POST" action="/add_todo">
-<input name="text">
-<button>추가</button>
+<input name="text" placeholder="Something we want to do">
+<button>Add</button>
 </form>
 
-<ul>
 {% for t in todos %}
-<li class="{% if t[2] %}done{% endif %}">
+<p class="{% if t[2] %}todo-done{% endif %}">
 <a href="/toggle_todo/{{t[0]}}">✔</a> {{t[1]}}
-</li>
+</p>
 {% endfor %}
-</ul>
 </div>
 
-<!-- 기념일 -->
-<div class="section">
-<h2>기념일</h2>
+
+<!-- 📅 -->
+<div class="card">
+<h3>Anniversary</h3>
+
 <form method="POST" action="/add_event">
-<input name="title">
+<input name="title" placeholder="Title">
 <input type="date" name="date">
-<input name="memo">
-<button>추가</button>
+<input name="memo" placeholder="Memo">
+<button>Add</button>
 </form>
 
-<ul>
 {% for e in events %}
-<li>{{e[1]}} - {{e[2]}} <a href="/delete_event/{{e[0]}}">삭제</a></li>
+<p>{{e[1]}} - {{e[2]}} <a href="/delete_event/{{e[0]}}">x</a></p>
 {% endfor %}
-</ul>
 </div>
 
-<!-- 앨범 -->
-<div class="section">
-<h2>추억 앨범</h2>
+
+<!-- 📸 -->
+<div class="card">
+<h3>Gallery</h3>
 
 <form method="POST" action="/upload_photo" enctype="multipart/form-data">
 <input type="file" name="photo">
-<input name="caption">
-<button>업로드</button>
+<input name="caption" placeholder="Caption">
+<button>Upload</button>
 </form>
 
-<div>
+<div style="display:flex; gap:10px; flex-wrap:wrap;">
 {% for p in photos %}
 <div>
-<img src="/static/uploads/{{p[1]}}" width="150"><br>
-{{p[2]}}
-<a href="/delete_photo/{{p[0]}}">삭제</a>
+<img src="/static/uploads/{{p[1]}}" width="120"><br>
+{{p[2]}} <br>
+<a href="/delete_photo/{{p[0]}}">x</a>
 </div>
 {% endfor %}
+</div>
+
 </div>
 
 </div>

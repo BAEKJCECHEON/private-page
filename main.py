@@ -63,7 +63,7 @@ init_db()
 
 # D-day
 def get_dday():
-    start_date = datetime(2024, 1, 17)
+    start_date = datetime(2026, 1, 17)
     today = datetime.now()
     return (today - start_date).days + 1
 

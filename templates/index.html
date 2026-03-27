@@ -1,35 +1,64 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>우리의 공간</title>
+    <title>Private Space</title>
+
     <style>
         body {
-            background: linear-gradient(to right, #ff9a9e, #fad0c4);
-            text-align: center;
-            font-family: sans-serif;
-            padding-top: 100px;
+            margin:0;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f5f5f7;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            height:100vh;
         }
 
-        .box {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            display: inline-block;
+        .card {
+            background:white;
+            padding:40px;
+            border-radius:20px;
+            width:320px;
+            text-align:center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        h2 {
+            font-weight:500;
+            margin-bottom:20px;
+        }
+
+        input {
+            width:100%;
+            padding:12px;
+            border-radius:10px;
+            border:1px solid #ddd;
+            margin-bottom:15px;
+        }
+
+        button {
+            width:100%;
+            padding:12px;
+            border:none;
+            border-radius:10px;
+            background:black;
+            color:white;
+            cursor:pointer;
         }
     </style>
 </head>
 <body>
 
-<div class="box">
-    <h2>어서오세요</h2>
+<div class="card">
+    <h2>Private Space</h2>
 
     <form method="POST">
-        <input type="password" name="password">
-        <button>입장</button>
+        <input type="password" name="password" placeholder="Password">
+        <button>Enter</button>
     </form>
 
     {% if error %}
-        <p style="color:red;">비밀번호 틀림 😢</p>
+        <p style="color:red;">Wrong password</p>
     {% endif %}
 </div>
 
