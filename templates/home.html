@@ -1,156 +1,141 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-
-<title>Home</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-* {
-    box-sizing: border-box;
-}
-
 body {
-    margin:0;
     font-family:-apple-system;
+    margin:0;
     background:#f2f2f7;
 }
 
-/* 상단 */
-.header {
-    position:sticky;
-    top:0;
-    background:#f2f2f7;
-    padding: env(safe-area-inset-top) 20px 10px;
-    z-index:10;
-}
-
-/* 컨테이너 */
 .container {
     max-width:420px;
     margin:auto;
-    padding:10px 16px 40px;
+    padding:16px;
 }
 
-/* dday */
+.card {
+    background:white;
+    border-radius:20px;
+    padding:16px;
+    margin-bottom:16px;
+}
+
 .dday {
-    font-size:26px;
+    font-size:24px;
     font-weight:700;
 }
 
-.user {
+/* 달력 */
+.calendar {
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:6px;
+    margin-top:10px;
+}
+
+.day {
+    background:#f5f5f7;
+    border-radius:10px;
+    padding:6px;
+    min-height:70px;
     font-size:12px;
-    color:#8e8e93;
 }
 
-/* 카드 */
-.card {
-    background:white;
-    border-radius:22px;
-    padding:18px;
-    margin-top:14px;
+.day b {
+    font-size:13px;
 }
 
-/* 제목 */
-.section-title {
-    font-size:15px;
-    font-weight:600;
-    margin-bottom:10px;
+/* 일정 표시 */
+.schedule {
+    margin-top:4px;
+    font-size:10px;
+    background:black;
+    color:white;
+    border-radius:6px;
+    padding:2px 4px;
 }
 
 /* 입력 */
-textarea, input {
+input, textarea {
     width:100%;
+    padding:10px;
+    margin-top:8px;
+    border-radius:10px;
     border:none;
     background:#f5f5f7;
-    border-radius:12px;
-    padding:12px;
-    font-size:16px; /* iOS 확대 방지 */
-    margin-top:8px;
+    font-size:16px;
 }
 
-/* 버튼 */
 button {
-    margin-top:10px;
+    margin-top:8px;
     width:100%;
-    height:48px;
+    height:40px;
     border:none;
-    border-radius:12px;
+    border-radius:10px;
     background:black;
     color:white;
-    font-size:15px;
-}
-
-/* 리스트 */
-.item {
-    padding:12px 0;
-    border-bottom:1px solid #eee;
-}
-
-.meta {
-    font-size:12px;
-    color:#8e8e93;
-}
-
-/* 갤러리 */
-.gallery {
-    display:grid;
-    grid-template-columns:repeat(3, 1fr);
-    gap:8px;
-    margin-top:10px;
-}
-
-.gallery img {
-    width:100%;
-    aspect-ratio:1/1;
-    object-fit:cover;
-    border-radius:10px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="header">
-    <div class="dday">❤️ {{ dday }} days</div>
-    <div class="user">{{ user }} | <a href="/logout">Logout</a></div>
-</div>
-
 <div class="container">
 
-<!-- 💌 -->
 <div class="card">
-    <div class="section-title">Letters</div>
+    <div class="dday">❤️ {{ dday }} days</div>
+    <div>{{ user }} | <a href="/logout">logout</a></div>
+</div>
+
+<!-- 📅 캘린더 -->
+<div class="card">
+    <b>{{ year }} - {{ month }}</b>
+
+    <div class="calendar">
+        {% for week in calendar %}
+            {% for day in week %}
+                <div class="day">
+                    {% if day != 0 %}
+                        <b>{{ day }}</b>
+
+                        {% for s in schedules %}
+                            {% if s[1].startswith(year|string + "-" + "%02d"|format(month) + "-" + "%02d"|format(day)) %}
+                                <div class="schedule">{{ s[2] }}</div>
+                            {% endif %}
+                        {% endfor %}
+
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+
+    <form method="POST" action="/add_schedule">
+        <input type="date" name="date">
+        <input name="content" placeholder="일정">
+        <button>Add</button>
+    </form>
+</div>
+
+<!-- 💌 Letters -->
+<div class="card">
+    <b>Letters</b>
 
     <form method="POST" action="/post">
-        <textarea name="content" placeholder="내용 입력"></textarea>
+        <textarea name="content"></textarea>
         <button>Add</button>
     </form>
 
     {% for p in posts %}
-    <div class="item">
+    <div>
         <div>{{ p[1] }}</div>
-        <div class="meta">{{ p[2] }} · {{ p[3] }}</div>
+        <small>{{ p[2] }} · {{ p[3] }}</small>
+        <hr>
     </div>
     {% endfor %}
-</div>
-
-<!-- 📸 -->
-<div class="card">
-    <div class="section-title">Gallery</div>
-
-    <form method="POST" action="/upload_photo" enctype="multipart/form-data">
-        <input type="file" name="photo">
-        <input name="caption" placeholder="설명">
-        <button>Upload</button>
-    </form>
-
-    <div class="gallery">
-        {% for p in photos %}
-        <img src="/static/uploads/{{p[1]}}">
-        {% endfor %}
-    </div>
 </div>
 
 </div>

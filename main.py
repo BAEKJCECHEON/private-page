@@ -1,20 +1,16 @@
 from flask import Flask, request, redirect, session, render_template
 import psycopg2
 from datetime import datetime
+import calendar
 
 app = Flask(__name__)
 app.secret_key = "secret-key"
 
-# 🔥 너 DB URL
 DATABASE_URL = "postgresql://mydb_qftc_user:UpdqTVT3YO30EAAk6n7oqNpkDCFxTMLK@dpg-d731j5fkijhs73d8gq4g-a/mydb_qftc"
 
-
-# DB 연결 함수
 def get_conn():
     return psycopg2.connect(DATABASE_URL)
 
-
-# DB 초기화
 def init_db():
     conn = get_conn()
     c = conn.cursor()
@@ -29,27 +25,21 @@ def init_db():
     ''')
 
     c.execute('''
-    CREATE TABLE IF NOT EXISTS photos (
+    CREATE TABLE IF NOT EXISTS schedules (
         id SERIAL PRIMARY KEY,
-        filename TEXT,
-        caption TEXT,
-        user TEXT,
-        created_at TEXT
+        date TEXT,
+        content TEXT,
+        user TEXT
     )
     ''')
 
     conn.commit()
     conn.close()
 
-
-# D-DAY 계산
 def get_dday():
     start = datetime(2026, 1, 17)
-    today = datetime.now()
-    return (today - start).days + 1
+    return (datetime.now() - start).days + 1
 
-
-# 로그인
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
@@ -59,19 +49,15 @@ def index():
             session["auth"] = True
             session["user"] = "수연"
             return redirect("/home")
-
         elif pw == "root":
             session["auth"] = True
             session["user"] = "재천"
             return redirect("/home")
-
         else:
             return render_template("index.html", error=True)
 
     return render_template("index.html")
 
-
-# 홈
 @app.route("/home")
 def home():
     if not session.get("auth"):
@@ -80,27 +66,32 @@ def home():
     conn = get_conn()
     c = conn.cursor()
 
+    # 글
     c.execute("SELECT * FROM posts ORDER BY id DESC")
     posts = c.fetchall()
 
-    c.execute("SELECT * FROM photos ORDER BY id DESC")
-    photos = c.fetchall()
+    # 일정
+    c.execute("SELECT * FROM schedules")
+    schedules = c.fetchall()
 
     conn.close()
 
+    today = datetime.now()
+    year = today.year
+    month = today.month
+    cal = calendar.monthcalendar(year, month)
+
     return render_template("home.html",
                            posts=posts,
-                           photos=photos,
+                           schedules=schedules,
+                           calendar=cal,
+                           year=year,
+                           month=month,
                            user=session.get("user"),
                            dday=get_dday())
 
-
-# 글 작성
 @app.route("/post", methods=["POST"])
 def post():
-    if not session.get("auth"):
-        return redirect("/")
-
     conn = get_conn()
     c = conn.cursor()
 
@@ -115,45 +106,27 @@ def post():
     conn.close()
     return redirect("/home")
 
+@app.route("/add_schedule", methods=["POST"])
+def add_schedule():
+    conn = get_conn()
+    c = conn.cursor()
 
-# 사진 업로드
-@app.route("/upload_photo", methods=["POST"])
-def upload_photo():
-    if not session.get("auth"):
-        return redirect("/")
+    c.execute(
+        "INSERT INTO schedules (date, content, user) VALUES (%s, %s, %s)",
+        (request.form["date"],
+         request.form["content"],
+         session["user"])
+    )
 
-    file = request.files["photo"]
-    caption = request.form.get("caption")
-
-    if file:
-        filename = file.filename
-        file.save("static/uploads/" + filename)
-
-        conn = get_conn()
-        c = conn.cursor()
-
-        c.execute(
-            "INSERT INTO photos (filename, caption, user, created_at) VALUES (%s, %s, %s, %s)",
-            (filename,
-             caption,
-             session["user"],
-             datetime.now().strftime("%Y-%m-%d"))
-        )
-
-        conn.commit()
-        conn.close()
-
+    conn.commit()
+    conn.close()
     return redirect("/home")
 
-
-# 로그아웃
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect("/")
 
-
-# 실행
 if __name__ == "__main__":
     init_db()
     app.run(host="0.0.0.0", port=5000)
