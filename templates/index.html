@@ -1,18 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Welcome</title>
+    <title>우리의 공간</title>
+    <style>
+        body {
+            background: linear-gradient(to right, #ff9a9e, #fad0c4);
+            text-align: center;
+            font-family: sans-serif;
+            padding-top: 100px;
+        }
+
+        .box {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+    </style>
 </head>
 <body>
-    <h2>🔐 비밀번호를 입력하세요</h2>
 
-    <form method="POST" action="/">
-        <input type="password" name="password" placeholder="비밀번호"/>
+<div class="box">
+    <h2>어서오세요</h2>
+
+    <form method="POST">
+        <input type="password" name="password">
         <button>입장</button>
     </form>
 
     {% if error %}
-        <p style="color:red;">비밀번호 틀림</p>
+        <p style="color:red;">비밀번호 틀림 😢</p>
     {% endif %}
+</div>
+
 </body>
 </html>
