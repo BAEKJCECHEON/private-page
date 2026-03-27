@@ -4,6 +4,10 @@
     <title>Private Space</title>
 
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             margin:0;
             font-family: -apple-system, BlinkMacSystemFont, sans-serif;
@@ -16,16 +20,23 @@
 
         .card {
             background:white;
-            padding:40px;
+            padding:32px;
             border-radius:20px;
-            width:320px;
-            text-align:center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            width:340px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
         }
 
         h2 {
-            font-weight:500;
-            margin-bottom:20px;
+            font-size:20px;
+            font-weight:600;
+            margin-bottom:24px;
+            text-align:center;
+        }
+
+        form {
+            display:flex;
+            flex-direction:column;
+            gap:12px;
         }
 
         input {
@@ -33,20 +44,40 @@
             padding:12px;
             border-radius:10px;
             border:1px solid #ddd;
-            margin-bottom:15px;
+            font-size:14px;
+            outline:none;
+            transition: all 0.2s;
+        }
+
+        input:focus {
+            border-color: #0071e3;
+            box-shadow: 0 0 0 2px rgba(0,113,227,0.2);
         }
 
         button {
-            width:100%;
             padding:12px;
             border:none;
             border-radius:10px;
             background:black;
             color:white;
+            font-size:14px;
             cursor:pointer;
+            transition: opacity 0.2s;
+        }
+
+        button:hover {
+            opacity:0.85;
+        }
+
+        .error {
+            margin-top:12px;
+            font-size:13px;
+            color:#ff3b30;
+            text-align:center;
         }
     </style>
 </head>
+
 <body>
 
 <div class="card">
@@ -58,7 +89,7 @@
     </form>
 
     {% if error %}
-        <p style="color:red;">Wrong password</p>
+        <div class="error">Wrong password</div>
     {% endif %}
 </div>
 
