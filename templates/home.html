@@ -2,6 +2,9 @@
 <html>
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<title>Home</title>
 
 <style>
 * {
@@ -9,115 +12,116 @@
 }
 
 body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-    background: #f5f5f7;
-    color: #1d1d1f;
-}
-
-/* 전체 컨테이너 */
-.container {
-    max-width: 720px;
-    margin: 60px auto;
-    padding: 0 20px;
+    margin:0;
+    font-family:-apple-system;
+    background:#f2f2f7;
 }
 
 /* 상단 */
 .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 40px;
+    position:sticky;
+    top:0;
+    background:#f2f2f7;
+    padding: env(safe-area-inset-top) 20px 10px;
+    z-index:10;
 }
 
-h1 {
-    font-size: 28px;
-    font-weight: 600;
+/* 컨테이너 */
+.container {
+    max-width:420px;
+    margin:auto;
+    padding:10px 16px 40px;
+}
+
+/* dday */
+.dday {
+    font-size:26px;
+    font-weight:700;
+}
+
+.user {
+    font-size:12px;
+    color:#8e8e93;
 }
 
 /* 카드 */
 .card {
-    background: white;
-    border-radius: 20px;
-    padding: 24px;
-    margin-bottom: 30px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+    background:white;
+    border-radius:22px;
+    padding:18px;
+    margin-top:14px;
+}
+
+/* 제목 */
+.section-title {
+    font-size:15px;
+    font-weight:600;
+    margin-bottom:10px;
 }
 
 /* 입력 */
-textarea, input[type="text"], input[type="file"] {
-    width: 100%;
-    padding: 12px;
-    margin-top: 12px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    font-size: 14px;
+textarea, input {
+    width:100%;
+    border:none;
+    background:#f5f5f7;
+    border-radius:12px;
+    padding:12px;
+    font-size:16px; /* iOS 확대 방지 */
+    margin-top:8px;
 }
 
 /* 버튼 */
 button {
-    margin-top: 12px;
-    padding: 10px 14px;
-    border: none;
-    border-radius: 10px;
-    background: black;
-    color: white;
-    font-size: 14px;
-    cursor: pointer;
+    margin-top:10px;
+    width:100%;
+    height:48px;
+    border:none;
+    border-radius:12px;
+    background:black;
+    color:white;
+    font-size:15px;
 }
 
-/* 리스트 아이템 */
+/* 리스트 */
 .item {
-    padding: 14px 0;
-    border-bottom: 1px solid #eee;
+    padding:12px 0;
+    border-bottom:1px solid #eee;
 }
 
-.item:last-child {
-    border-bottom: none;
-}
-
-/* 메타 정보 */
 .meta {
-    font-size: 12px;
-    color: #86868b;
-    margin-top: 4px;
+    font-size:12px;
+    color:#8e8e93;
 }
 
 /* 갤러리 */
 .gallery {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 16px;
-    margin-top: 20px;
-}
-
-.gallery-item {
-    text-align: center;
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:8px;
+    margin-top:10px;
 }
 
 .gallery img {
-    width: 100%;
-    height: 120px;
-    object-fit: cover;
-    border-radius: 12px;
+    width:100%;
+    aspect-ratio:1/1;
+    object-fit:cover;
+    border-radius:10px;
 }
-
 </style>
 </head>
 
 <body>
 
-<div class="container">
-
-<!-- 헤더 -->
 <div class="header">
-    <h1>❤️ {{ dday }} days</h1>
-    <div>{{ user }} | <a href="/logout">Logout</a></div>
+    <div class="dday">❤️ {{ dday }} days</div>
+    <div class="user">{{ user }} | <a href="/logout">Logout</a></div>
 </div>
 
-<!-- 💌 Letters -->
+<div class="container">
+
+<!-- 💌 -->
 <div class="card">
-    <h3>Letters</h3>
+    <div class="section-title">Letters</div>
 
     <form method="POST" action="/post">
         <textarea name="content" placeholder="Write something..."></textarea>
@@ -132,23 +136,19 @@ button {
     {% endfor %}
 </div>
 
-
-<!-- 📸 Gallery -->
+<!-- 📸 -->
 <div class="card">
-    <h3>Gallery</h3>
+    <div class="section-title">Gallery</div>
 
     <form method="POST" action="/upload_photo" enctype="multipart/form-data">
         <input type="file" name="photo">
-        <input type="text" name="caption" placeholder="Caption">
+        <input name="caption" placeholder="Caption">
         <button>Upload</button>
     </form>
 
     <div class="gallery">
         {% for p in photos %}
-        <div class="gallery-item">
-            <img src="/static/uploads/{{p[1]}}">
-            <div class="meta">{{ p[3] }}</div>
-        </div>
+        <img src="/static/uploads/{{p[1]}}">
         {% endfor %}
     </div>
 </div>
