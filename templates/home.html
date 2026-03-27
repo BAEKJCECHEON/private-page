@@ -105,23 +105,25 @@ img {
 
 
 <!-- ✅ -->
-<div class="card">
-<h3>Bucket List</h3>
-<form method="POST" action="/add_todo">
-<input name="text">
-<button>Add</button>
-</form>
+<!--
+    <div class="card">
+    <h3>Bucket List</h3>
+    <form method="POST" action="/add_todo">
+    <input name="text">
+    <button>Add</button>
+    </form>
 
-{% for t in todos %}
-<div class="item {% if t[3] %}done{% endif %}">
-    <a href="/toggle_todo/{{t[0]}}">✔</a> {{t[1]}}
-    <div class="meta">{{t[2]}}</div>
-</div>
-{% endfor %}
-</div>
-
+    {% for t in todos %}
+    <div class="item {% if t[3] %}done{% endif %}">
+        <a href="/toggle_todo/{{t[0]}}">✔</a> {{t[1]}}
+        <div class="meta">{{t[2]}}</div>
+    </div>
+    {% endfor %}
+    </div>
+-->
 
 <!-- 📅 -->
+<!--
 <div class="card">
 <h3>Anniversary</h3>
 <form method="POST" action="/add_event">
@@ -138,6 +140,9 @@ img {
 </div>
 {% endfor %}
 </div>
+-->
+
+
 
 
 <!-- 📸 -->
