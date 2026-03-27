@@ -7,42 +7,43 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 app.secret_key = "secret-key"
 
-# 업로드 폴더
 UPLOAD_FOLDER = "static/uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 
-# DB 초기화
 def init_db():
     conn = sqlite3.connect("app.db")
     c = conn.cursor()
 
-    # 게시판
+    # 💌 편지
     c.execute('''
     CREATE TABLE IF NOT EXISTS posts (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         content TEXT,
+        user TEXT,
         created_at TEXT
     )
     ''')
 
-    # todo
+    # ✅ todo
     c.execute('''
     CREATE TABLE IF NOT EXISTS todos (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         text TEXT,
+        user TEXT,
         done INTEGER
     )
     ''')
 
-    # 기념일
+    # 📅 기념일
     c.execute('''
     CREATE TABLE IF NOT EXISTS events (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT,
         date TEXT,
-        memo TEXT
+        memo TEXT,
+        user TEXT
     )
     ''')
 
@@ -51,7 +52,8 @@ def init_db():
     CREATE TABLE IF NOT EXISTS photos (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         filename TEXT,
-        caption TEXT
+        caption TEXT,
+        user TEXT
     )
     ''')
 
@@ -61,25 +63,32 @@ def init_db():
 init_db()
 
 
-# D-day
 def get_dday():
     start_date = datetime(2026, 1, 17)
-    today = datetime.now()
-    return (today - start_date).days + 1
+    return (datetime.now() - start_date).days + 1
 
 
-# 로그인
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
-        if request.form.get("password") == "134679":
+        pw = request.form.get("password")
+
+        if pw == "134679":
             session["auth"] = True
+            session["user"] = "수연"
             return redirect("/home")
+
+        elif pw == "root":
+            session["auth"] = True
+            session["user"] = "재천"
+            return redirect("/home")
+
         else:
             return render_template("index.html", error=True)
+
     return render_template("index.html")
 
-# 홈
+
 @app.route("/home")
 def home():
     if not session.get("auth"):
@@ -100,16 +109,18 @@ def home():
                            todos=todos,
                            events=events,
                            photos=photos,
-                           dday=get_dday())
+                           dday=get_dday(),
+                           user=session.get("user"))
 
 
-# 게시판
+# 💌
 @app.route("/post", methods=["POST"])
 def post():
     conn = sqlite3.connect("app.db")
     c = conn.cursor()
-    c.execute("INSERT INTO posts (content, created_at) VALUES (?, ?)",
-              (request.form["content"], datetime.now().strftime("%Y-%m-%d")))
+    c.execute("INSERT INTO posts (content, user, created_at) VALUES (?, ?, ?)",
+              (request.form["content"], session["user"],
+               datetime.now().strftime("%Y-%m-%d")))
     conn.commit()
     conn.close()
     return redirect("/home")
@@ -125,13 +136,13 @@ def delete_post(id):
     return redirect("/home")
 
 
-# todo
+# ✅
 @app.route("/add_todo", methods=["POST"])
 def add_todo():
     conn = sqlite3.connect("app.db")
     c = conn.cursor()
-    c.execute("INSERT INTO todos (text, done) VALUES (?, 0)",
-              (request.form["text"],))
+    c.execute("INSERT INTO todos (text, user, done) VALUES (?, ?, 0)",
+              (request.form["text"], session["user"]))
     conn.commit()
     conn.close()
     return redirect("/home")
@@ -147,13 +158,14 @@ def toggle_todo(id):
     return redirect("/home")
 
 
-# 기념일
+# 📅
 @app.route("/add_event", methods=["POST"])
 def add_event():
     conn = sqlite3.connect("app.db")
     c = conn.cursor()
-    c.execute("INSERT INTO events (title, date, memo) VALUES (?, ?, ?)",
-              (request.form["title"], request.form["date"], request.form["memo"]))
+    c.execute("INSERT INTO events (title, date, memo, user) VALUES (?, ?, ?, ?)",
+              (request.form["title"], request.form["date"],
+               request.form["memo"], session["user"]))
     conn.commit()
     conn.close()
     return redirect("/home")
@@ -169,7 +181,7 @@ def delete_event(id):
     return redirect("/home")
 
 
-# 📸 앨범
+# 📸
 @app.route("/upload_photo", methods=["POST"])
 def upload_photo():
     file = request.files["photo"]
@@ -177,13 +189,12 @@ def upload_photo():
 
     if file:
         filename = secure_filename(file.filename)
-        filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
-        file.save(filepath)
+        file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
 
         conn = sqlite3.connect("app.db")
         c = conn.cursor()
-        c.execute("INSERT INTO photos (filename, caption) VALUES (?, ?)",
-                  (filename, caption))
+        c.execute("INSERT INTO photos (filename, caption, user) VALUES (?, ?, ?)",
+                  (filename, caption, session["user"]))
         conn.commit()
         conn.close()
 
